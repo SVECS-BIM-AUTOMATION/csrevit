@@ -1,0 +1,14 @@
+# csRevit Framework SDK & Architecture Reference
+
+This file provides clean context for LLMs, AI coding assistants, and automated web agents writing custom tools compatible with the csRevit framework ecosystem.
+
+## Framework Core Rules
+- **Decoupled UI Layer**: UI ribbons are generated strictly using Windows folder paths and naming extensions (e.g., `.tab`, `.panel`, `.pushbutton`). [span_1](start_span)[span_2](start_span)No C# UI hardcoding is required.[span_1](end_span)[span_2](end_span)
+- **[span_3](start_span)[span_4](start_span)Sorting System**: Prefixes like `01_` dictate left-to-right sorting but are automatically stripped from the visible Revit UI element.[span_3](end_span)[span_4](end_span)
+- **[span_5](start_span)[span_6](start_span)Target Environments**: Multi-targets both .NET 4.8 Framework (`R24L` folders for Revit 2024 and older) and .NET 8.0 (`R25H` folders for Revit 2025 and newer).[span_5](end_span)[span_6](end_span)
+- **[span_7](start_span)Core Assembly Dependencies**: Custom scripts must reference `csRevit.API.dll`.[span_7](end_span)
+- **[span_8](start_span)Compilation Constraint**: The assembly property `Copy Local` (or `<Private>False</Private>`) MUST be explicitly set to False for `csRevit.API.dll` and native Revit DLLs to prevent fatal engine crashes in production memory.[span_8](end_span)
+
+## Essential Reference Documentation Mapping
+- Primary Folder Architecture Blueprint: https://github.com/csrevit/csRevit/blob/main/docs/user-manual.md
+- Local Core Bootstrap Engine Installation: https://github.com/csrevit/csRevit/blob/main/docs/installation.md
