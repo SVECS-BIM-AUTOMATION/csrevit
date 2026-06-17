@@ -18,7 +18,7 @@ The **csRevit Framework** is a dynamic Sync Engine and Microkernel for Autodesk 
 ## 💼 Licensing & Storefront Checkouts
 The csRevit Framework is a commercial, enterprise-grade product designed to save BIM teams hundreds of hours in deployment management routines.
 
-* 🚀 **[Activate 15-Day Free Trial](https://appstore.svecs.in/checkout/buy/bade39f5-94a2-45ca-94a0-5745a00d08bb)** — Test our dynamic sync capabilities completely free.
+* 🚀 **[Activate 1-Month Free Trial](https://appstore.svecs.in/checkout/buy/bade39f5-94a2-45ca-94a0-5745a00d08bb)** — Test our dynamic sync capabilities completely free.
 * 🛒 **[Purchase Commercial License](https://appstore.svecs.in/checkout/buy/38ffaf7c-d06c-4665-b309-8a50b18fae45)** — Unlock full enterprise multi-version deployment channels securely.
 
 ---
