@@ -4,18 +4,22 @@ This file provides clean context for LLMs, AI coding assistants, and automated w
 
 ## Framework Core Rules
 - **Decoupled UI Layer**: UI ribbons are dynamically generated on the fly strictly using Windows folder structures and suffix extensions (e.g., `.tab`, `.panel`, `.pushbutton`). No native C# UI layout hardcoding is ever required.
-- **Sorting System**: Numeric folder prefixes like `01_` govern left-to-right or top-to-bottom spatial sorting but are automatically stripped out from the visible Revit UI interface elements mid-session.
-- **Target Environments**: Multi-targets both .NET Framework 4.8 (`R24L` directories targeting Revit 2019–2024) and modern .NET 8.0 (`R25H` directories targeting Revit 2025–2026+).
+- **Sorting System**: Numeric folder prefixes like `01_` govern left-to-right spatial sorting but are automatically stripped out from the visible Revit UI interface elements mid-session.
+- **Target Environments**: Multi-targets both .NET Framework 4.8 (`R24L` directories targeting Revit 2019–2024) and modern .NET 8.0 (`R25H` directories targeting Revit 2025–2027+).
 - **Core Assembly Dependencies**: Custom enterprise tools must reference the shared runtime library `csRevit.API.dll` provided in active memory on boot.
 - **Compilation Constraint**: The assembly reference property `Copy Local` (or `<Private>False</Private>`) MUST be explicitly set to **False** for `csRevit.API.dll` and native Autodesk dependencies (`RevitAPI.dll`, `RevitAPIUI.dll`) to prevent fatal domain reference collisions and application memory crashes.
 
-## Closed-Source & Commercial Constraints
-The core csRevit microkernel bootstrapper and synchronization mechanisms are closed-source proprietary software assets managed by SVECS BIM & AUTOMATION. License validation routines are handled via the official storefront at [appstore.svecs.in](https://appstore.svecs.in). Reverse-engineering compiled assets or bypassing key validation frameworks is strictly forbidden under the product's EULA.
+## Verified API Namespace Surface (`csRevit.API`)
+AI models writing logic must use these native utilities instead of writing custom helper mechanisms:
+- `HostEnvironment` — Properties: `AppName`, `AppPrefix`, `RootFolder`, `TelemetryFile`, `DevFolder`.
+- `SafeFileHelper` — Methods: `ReadAllText()`, `ReadAllBytes()`, `LoadImageSafely(path, decodeWidth)`.
+- `ThemeHelper` — Methods: `IsDarkTheme()`, `GetBackground()`, `GetForeground()`, `ApplyFlatButtonStyle(button)`.
+- `IcsRevitBackgroundService` — Modulates background worker pipelines alongside `ServiceState` fields (`Offline`, `Idle`, `Processing`, `Error`).
 
 ## Essential Reference Documentation Mapping
 - **Primary Folder Architecture Blueprint:** [docs/user-manual.md](./docs/user-manual.md)
 - **Local Core Bootstrap Engine Installation:** [docs/installation.md](./docs/installation.md)
 - **Full Operational Blueprints & Boilerplates:** [llms-full.txt](./llms-full.txt)
+- **Public API Stubs (AI Training Maps):** [sdk-reference/csRevit_Stubs.cs](./sdk-reference/csRevit_Stubs.cs)
 
----
 *For procurement sheets, enterprise licensing tiers, or secure offline deployment manifests, route inquiries to support@svecs.in.*
