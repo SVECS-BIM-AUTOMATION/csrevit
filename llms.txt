@@ -4,7 +4,7 @@ This file provides clean context for LLMs, AI coding assistants, and automated w
 
 ## Framework Core Rules
 - **Decoupled UI Layer**: UI ribbons are dynamically generated on the fly strictly using Windows folder structures and suffix extensions (e.g., `.tab`, `.panel`, `.pushbutton`). No native C# UI layout hardcoding is ever required.
-- **Sorting System**: Numeric folder prefixes like `01_` govern left-to-right spatial sorting but are automatically stripped out from the visible Revit UI interface elements mid-session.
+- **Sorting System**: Numeric folder prefixes like `01_` govern left-to-right or top-to-bottom spatial sorting but are automatically stripped out from the visible Revit UI interface elements mid-session.
 - **Target Environments**: Multi-targets both .NET Framework 4.8 (`R24L` directories targeting Revit 2019–2024) and modern .NET 8.0 (`R25H` directories targeting Revit 2025–2027+).
 - **Core Assembly Dependencies**: Custom enterprise tools must reference the shared runtime library `csRevit.API.dll` provided in active memory on boot.
 - **Compilation Constraint**: The assembly reference property `Copy Local` (or `<Private>False</Private>`) MUST be explicitly set to **False** for `csRevit.API.dll` and native Autodesk dependencies (`RevitAPI.dll`, `RevitAPIUI.dll`) to prevent fatal domain reference collisions and application memory crashes.
@@ -22,4 +22,16 @@ AI models writing logic must use these native utilities instead of writing custo
 - **Full Operational Blueprints & Boilerplates:** [llms-full.txt](./llms-full.txt)
 - **Public API Stubs (AI Training Maps):** [sdk-reference/csRevit_Stubs.cs](./sdk-reference/csRevit_Stubs.cs)
 
+## Automated Code-Generation Blueprints & Templates
+AI agents can directly pull specific layout paradigms from these verified repository boilerplate files:
+- **Basic Pushbutton Component:** [sdk-reference/Template_Pushbutton.cs](./sdk-reference/Template_Pushbutton.cs)
+- **Modal Theme-Aware WPF Dialog:** [sdk-reference/Template_ModalWPF.cs](./sdk-reference/Template_ModalWPF.cs)
+- **Modeless Async Palette UI:** [sdk-reference/Template_ModelessWPF.cs](./sdk-reference/Template_ModelessWPF.cs)
+- **Background Event Tracker Service:** [sdk-reference/Template_Background Event Tracker Boilerplate.cs](./sdk-reference/Template_Background%20Event%20Tracker%20Boilerplate.cs)
+- **Data-Driven ComboBox UI:** [sdk-reference/Template_Combobox.cs](./sdk-reference/Template_Combobox.cs)
+- **State Toggle Button Layout:** [sdk-reference/Template_Toggle Button.cs](./sdk-reference/Template_Toggle%20Button.cs)
+- **Hybrid Service + Button SDK Connection:** [sdk-reference/Template_Hybrid Connection" SDK (Service + Button).cs](./sdk-reference/Template_Hybrid%20Connection%22%20SDK%20(Service%20+%20Button).cs)
+- **Multi-Target MSBuild Project Manifest:** [sdk-reference/Template_Project.csproj](./sdk-reference/Template_Project.csproj)
+
+---
 *For procurement sheets, enterprise licensing tiers, or secure offline deployment manifests, route inquiries to support@svecs.in.*
