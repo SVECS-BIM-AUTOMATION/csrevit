@@ -10,7 +10,7 @@ csRevit is a commercial, enterprise-grade native C# Sync Engine and Microkernel 
 
 ### Core Architectural Mechanics:
 - **Zero-Restart UI Generation**: Ribbons, tabs, panels, and items are dynamically generated on the fly based on Windows folder hierarchies and explicit naming suffixes (e.g., `.tab`, `.panel`, `.pushbutton`). UI changes reflect mid-session upon triggering a sync without restarting active Revit user sessions.
-- **Multi-Version Concurrency**: Designed to run cleanly across different runtime systems natively (e.g., .NET Framework 4.8 for Revit 2019-2024 vs. .NET 8.0 for Revit 2025-2026+) without causing file lock collisions or assembly environment domain crashes.
+- **Multi-Version Concurrency**: Designed to run cleanly across different runtime systems natively (.NET Framework 4.8 for Revit 2019-2024 vs. .NET 8.0 for Revit 2025-2027+) without causing file lock collisions or assembly environment domain crashes.
 - **The Loader Engine**: A native bootstrapper client placed locally inside `%AppData%\Autodesk\ApplicationPlugins\csRevit.bundle` initializes on Revit startup, parses designated directories, and builds out ribbon mappings dynamically.
 - **Telemetry & Logs**: Automatically updates a centralized, thread-safe telemetry queue logging execution metrics, active users, and framework health metrics to a localized `Telemetry.csv` file on the organization's master drive.
 
@@ -90,12 +90,14 @@ All custom extensions, plug-in additions, and script payloads generated for use 
 
 ## 5. Complete C# Code Boilerplate Templates
 
-### A. Basic Pushbutton Script Layout (No Custom UI)
+
+### A. Basic Pushbutton Script Layout (No Custom UI) with `HostEnvironment`
 
 using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
+using csRevit.API;
 
 namespace csRevit_Tools
 {
@@ -111,7 +113,18 @@ namespace csRevit_Tools
 
             try
             {
-                // [csRevit-Architecture-Rule]: Insert custom document modifications inside transaction scopes here
+                // Access core paths cleanly via the actual HostEnvironment API
+                string root = HostEnvironment.RootFolder;
+                string devPath = HostEnvironment.DevFolder;
+
+                // Insert custom document modifications inside transaction scopes here
+                using (Transaction t = new Transaction(doc, "Quick Format"))
+                {
+                    t.Start();
+                    // Implementation goes here
+                    t.Commit();
+                }
+
                 return Result.Succeeded;
             }
             catch (Exception ex)
@@ -123,12 +136,13 @@ namespace csRevit_Tools
     }
 }
 
-B. Standard Modal Dialog WPF Initialization Template
 
-C#
+B. Standard Modal Dialog WPF Initialization & Theme Integration Template
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
+using csRevit.API;
 
 namespace csRevit_Tools
 {
@@ -140,11 +154,15 @@ namespace csRevit_Tools
             // 1. Initialize custom WPF window entity passing operational data context
             MyWpfWindow window = new MyWpfWindow(commandData.Application.ActiveUIDocument.Document);
 
-            // 2. Attach the main Revit application window frame container as the parent handle to maintain correct window placement positioning
+            // 2. Integrate precise styling via ThemeHelper
+            window.Background = ThemeHelper.GetBackground();
+            window.Foreground = ThemeHelper.GetForeground();
+
+            // 3. Attach the main Revit application window frame container as the parent handle to maintain correct window placement positioning
             var helper = new System.Windows.Interop.WindowInteropHelper(window);
             helper.Owner = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
 
-            // 3. Display modally to lock operational threads safely until user resolution
+            // 4. Display modally to lock operational threads safely until user resolution
             window.ShowDialog();
 
             return Result.Succeeded;
@@ -152,9 +170,9 @@ namespace csRevit_Tools
     }
 }
 
+
 C. Modeless Dialog Palette & External Event Integration Template
 
-C#
 using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -213,7 +231,6 @@ namespace csRevit_Tools
 
 D. Data-Driven State Toggle Button Template (.toggle)
 
-C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
@@ -244,9 +261,9 @@ namespace csRevit_Tools
     }
 }
 
+
 E. Data-Driven ComboBox Menu Selection Interface Template (.combobox)
 
-C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
@@ -274,7 +291,6 @@ namespace csRevit_Tools
 
 F. Idle/Background Application Event Tracking Template
 
-C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -318,9 +334,9 @@ namespace csRevit_Tools
     }
 }
 
+
 G. Hybrid SDK Connector Setup (Service Lifecycle + Interactive UI Trigger)
 
-C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using csRevit.API;
@@ -333,7 +349,7 @@ namespace csRevit_MyHybridTool
         // 1. Expose a public static thread-safe initialization handle so interactive UI commands can find this specific host service
         public static MyEnterpriseService Instance { get; private set; }
 
-        // 2. Populate contract mandates for the IcsRevitBackgroundService engine interface
+        // 2. Populate contract mandates for the IcsRevitBackgroundService engine interface from actual API properties
         public string ServiceName => "Enterprise Door Updater";
         public string Version => "1.0.0";
         public ServiceState CurrentState { get; private set; } = ServiceState.Offline;
@@ -365,11 +381,12 @@ namespace csRevit_MyHybridTool
             catch (System.Exception ex)
             {
                 message = ex.Message;
+                CurrentState = ServiceState.Error;
                 return Result.Failed;
             }
             finally
             {
-                CurrentState = ServiceState.Idle; // Unlock status tracks upon resolution loop completions
+                if (CurrentState != ServiceState.Error) CurrentState = ServiceState.Idle; // Unlock status tracks safely
             }
         }
     }
@@ -377,8 +394,7 @@ namespace csRevit_MyHybridTool
 
 H. Automated MSBuild Project Compilation Manifest (.csproj)
 
-XML
-<Project Sdk="Microsoft.NET.Sdk">
+XML<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
     <Platforms>x64</Platforms>
@@ -394,7 +410,8 @@ XML
     <Reference Include="System.Xaml" />
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
-      <Private>False</Private> </Reference>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="RevitAPIUI">
       <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
@@ -408,7 +425,8 @@ XML
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
-      <Private>False</Private> </Reference>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="RevitAPIUI">
       <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
@@ -438,11 +456,5 @@ XML
     <WriteLinesToFile File="$(Btn2)\class.txt" Lines="SelectNoneCommand" Overwrite="true" />
   </Target>
 </Project>
-6. Commercial Terms & Closed-Source Integrity
-Intellectual Property Protection
-  
-The core csRevit sync engine and compilation microkernel binaries are strictly closed-source, commercial property managed by SVECS BIM & AUTOMATION.   
 
-Reverse engineering, decompiling compiled assets (.dll elements), or distributing the core installers via unauthorized mirroring infrastructure is explicit violation of the framework's End User License Agreement (EULA). All pre-sales or post-purchase technical inquiries must route through official corporate help channels.   
-
-📩 Enterprise Support & Procurement Routing: support@svecs.in
+6. Commercial Terms & Closed-Source IntegrityIntellectual Property ProtectionThe core csRevit sync engine and compilation microkernel binaries are strictly closed-source, commercial property managed by SVECS BIM & AUTOMATION.Reverse engineering, decompiling compiled assets (.dll elements), or distributing the core installers via unauthorized mirroring infrastructure is explicit violation of the framework's End User License Agreement (EULA). All pre-sales or post-purchase technical inquiries must route through official corporate help channels.📩 Enterprise Support & Procurement Routing: support@svecs.in
