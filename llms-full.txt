@@ -6,39 +6,40 @@ This file contains the complete operational specification, installation procedur
 
 ## 1. System Overview & Core Architecture
 
-csRevit is a dynamic Sync Engine and Microkernel framework for Autodesk Revit that completely decouples User Interface generation from compiled C# code. 
+csRevit is a commercial, enterprise-grade native C# Sync Engine and Microkernel framework for Autodesk Revit that completely decouples User Interface generation from compiled code. It serves as a high-performance alternative to legacy scripting solutions, allowing firms to scale internal automation seamlessly.
 
 ### Core Architectural Mechanics:
-- **Zero-Restart UI Generation**: Ribbons, tabs, panels, and items are dynamically generated on the fly based on Windows folder hierarchies and explicit naming suffixes (e.g., `.tab`, `.panel`, `.pushbutton`). Changes reflect mid-session upon triggering a sync.
-- **Multi-Version Concurrency**: Designed to run cleanly across different runtime systems seamlessly (e.g., .NET 4.8 for Revit 2024 and older vs. .NET 8.0 for Revit 2025 and newer) without causing file lock collisions or assembly environment crashes.
-- **The Loader Engine**: A native bootstrapper client placed locally inside `%AppData%\Autodesk\ApplicationPlugins\csRevit.bundle` initializes on Revit startup, parses local/network directories, and builds out ribbon mappings dynamically.
-- **Telemetry & Logs**: Automatically updates a centralized, thread-safe telemetry queue logging software run speeds, active structural users, and runtime success metrics to a localized `Telemetry.csv` file on the master drive.
+- **Zero-Restart UI Generation**: Ribbons, tabs, panels, and items are dynamically generated on the fly based on Windows folder hierarchies and explicit naming suffixes (e.g., `.tab`, `.panel`, `.pushbutton`). UI changes reflect mid-session upon triggering a sync without restarting active Revit user sessions.
+- **Multi-Version Concurrency**: Designed to run cleanly across different runtime systems natively (e.g., .NET Framework 4.8 for Revit 2019-2024 vs. .NET 8.0 for Revit 2025-2026+) without causing file lock collisions or assembly environment domain crashes.
+- **The Loader Engine**: A native bootstrapper client placed locally inside `%AppData%\Autodesk\ApplicationPlugins\csRevit.bundle` initializes on Revit startup, parses designated directories, and builds out ribbon mappings dynamically.
+- **Telemetry & Logs**: Automatically updates a centralized, thread-safe telemetry queue logging execution metrics, active users, and framework health metrics to a localized `Telemetry.csv` file on the organization's master drive.
 
 ---
 
 ## 2. Global Installation & Deployment Guide
 
 ### System Prerequisites
-- **Autodesk Revit**: Version 2019 through 2025 installed natively.
+- **Autodesk Revit**: Versions 2019 through 2026 natively installed.
 - **Operating System**: Microsoft Windows 10 or Windows 11 (x64 platform target).
-- **Network Paths**: Active read/write credentials to the corporate central deployment target drive (e.g., `Z:\BIM\csRevit_Master`).
-- **Licensing Core**: Active validation key securely acquired via the official storefront (https://appstore.svecs.in).
+- **Network Paths**: Active read/write credentials to a shared corporate central deployment target drive or folder structure (e.g., `Z:\BIM\csRevit_Master`).
+- **Licensing Core**: Active commercial subscription key or authorized 15-day free trial key provisioned securely via the official merchant webstore (https://appstore.svecs.in).
 
 ### Bootstrap Setup Sequence
-1. Secure the executable deployment pack (`csRevit_Installer.exe`) from the management dashboard or app portal.
-2. Run the deployment pack. The installer automatically drops runtime binaries directly into the user application data directory:
+1. Secure the executable deployment pack (`csRevit_Installer.exe`) from your management account portal.
+2. Run the deployment pack. The bootstrapper installer drops runtime client binaries into the user application data directory:
    `C:\Users\%USERNAME%\AppData\Roaming\Autodesk\ApplicationPlugins\csRevit.bundle`
 3. Launch Autodesk Revit. Paste either the 15-Day Free Trial Key or Commercial License Key into the secure validation panel.
 4. Navigate to the newly generated `csRevit Core` tab on the ribbon, click **Global Settings** (Gear Icon), and link the **Master Network Path** field directly to the shared network storage folder (e.g., `Z:\BIM\csRevit_Master`).
-5. Select a discipline classification filter (e.g., `Architecture`, `MEP`, or `All`) to govern structural visibility filters.
+5. Select a discipline classification filter (e.g., `Architecture`, `Structure`, or `All`) to govern structural visibility filters.
 6. Click **Sync Tools** to instantly build out the custom tools ribbon mid-session.
+7. *IT Admin Note:* For silent corporate deployment across large workstation setups via Intune/SCCM, command line installation arguments are managed via private enterprise channels.
 
 ### Local Sandbox Development Workflow
-To safely prototype and compile new commands without altering production infrastructure, developers utilize a localized testing sandbox:
+To safely prototype and compile new commands without altering production corporate environments, developers utilize a localized testing sandbox:
 1. Local staging testing directory: `C:\Users\%USERNAME%\AppData\Roaming\csRevit\DEV`
 2. Any structured directory folder configurations placed in this workspace generate a dedicated `🛠️ DEV LAB` test tab dynamically inside Revit.
 3. Developers configure their project configurations (`.csproj`) to deploy compiled assets instantly to this folder workspace, then select **Reload UI** on the core tab to observe execution changes instantly.
-4. To move verified code live, developers select the **Publish Tool** option to securely package and relocate the folder schema directly to the Master Network Drive.
+4. To move verified code live, developers use the staging pipeline to securely relocate the folder schemas directly to the Master Network Drive production folder.
 
 ---
 
@@ -47,7 +48,7 @@ To safely prototype and compile new commands without altering production infrast
 The execution engine reads file directory extensions and names to formulate UI elements without hardcoded C# formatting.
 
 ### Directory Naming Rules:
-- **Prefix Sorting**: Numbers followed by an underscore (e.g., `01_`) govern layout positions from left-to-right or top-to-bottom. The parsing engine automatically strips these prefixes from the visual ribbon element.
+- **Prefix Sorting**: Numbers followed by an underscore (e.g., `01_`) govern layout positions from left-to-right or top-to-bottom. The parsing engine automatically strips these prefixes from the visual ribbon element. For example, `01_Modify.panel` renders cleanly as **Modify**.
 - **Suffix Mapping**:
   - `.tab` — Establishes a new primary ribbon category tab.
   - `.panel` — Registers a functional grouping layout container.
@@ -60,7 +61,7 @@ The execution engine reads file directory extensions and names to formulate UI e
 An active command directory (e.g., `Export PDF.pushbutton`) must contain the following structural file components to evaluate correctly:
 - `R24L/` (Folder) — Hosts compiled binaries target-built for .NET Framework 4.8 (Revit 2024 and older).
 - `R25H/` (Folder) — Hosts compiled binaries target-built for .NET 8.0 (Revit 2025 and newer).
-- `icon.png` — Visual graphic file ($32 \times 32$ pixels). The loader automatically scales this down to $16 \times 16$ if the tool resides inside a vertical `.stack` file setup.
+- `icon.png` — Visual graphic file (32 x 32 pixels). The loader automatically scales this down to 16 x 16 if the tool resides inside a vertical `.stack` file setup.
 - `help.txt` *(Optional)* — String literal data that automatically maps to the native F1 tool tooltip layout.
 - `demo.mp4` *(Optional)* — Short video asset that streams inside the tooltip popup menu on user mouse hover events.
 - `class.txt` *(Optional)* — Standard text string specifying the exact target entry-point C# Class name when grouping multiple executable tools inside a shared, singular compiled assembly DLL file.
@@ -70,20 +71,20 @@ An active command directory (e.g., `Export PDF.pushbutton`) must contain the fol
 
 ## 4. Software Development Kit (SDK) & Engineering Guidelines
 
-All custom extensions, plug-in additions, and script payloads generated for use inside the framework must explicitly comply with the following 6 Golden Rules:
+All custom extensions, plug-in additions, and script payloads generated for use inside the framework must explicitly comply with the following 6 Golden Rules of csRevit Engineering:
 
 ### The 6 Golden Rules of csRevit Engineering:
 1. **Interface Binding**: Direct UI components must cleanly inherit from `Autodesk.Revit.UI.IExternalCommand`. Background automated engines or pane interfaces must implement `Autodesk.Revit.UI.IExternalApplication`.
 2. **Transaction Scoping**: Every external command implementation class must be declared with an explicit database runtime behavior marker attribute: `[Transaction(TransactionMode.Manual)]`.
 3. **UI Display Attributes**: Use `[DisplayName("Button Name")]` and `[Description("Tooltip Info")]` tags directly above class signatures to control global search matching configurations and display formatting.
-4. **Platform Multi-Targeting**: Multi-target your project environments to cleanly emit runtime assemblies into both `.NET 4.8` (`R24L`) configurations and `.NET 8.0` (`R25H`) targets.
+4. **Platform Multi-Targeting**: Multi-target your project environments to cleanly emit runtime assemblies into both `.NET Framework 4.8` (`R24L`) configurations and `.NET 8.0` (`R25H`) targets.
 5. **Assembly Linking Reference**: Link your assemblies against `csRevit.API.dll`. The base bootstrapper engine provides this library layout in memory on initialization.
 6. **Reference Collision Preventions**: For every reference to native Revit binary dependencies (`RevitAPI.dll`, `RevitAPIUI.dll`) and our shared library `csRevit.API.dll`, the developer MUST absolutely toggle the Visual Studio property **`Copy Local = False`** (or `<Private>False</Private>` inside the XML configurations). Failing to implement this will result in fatal reference collision exceptions in the application domain memory footprint.
 
 ### WPF Interaction Paradigms:
 - **Modal Dialogs**: Blocks interactions with the Revit workspace window frame layout until exited. Initiated from `.pushbutton` directories via `myWindow.ShowDialog();` within safe execution loops.
 - **Modeless Palettes**: Keeps the user UI frames floating while allowing direct document element interactions. Loses immediate API context loop control. Developers must use Revit's native `IExternalEventHandler` and `ExternalEvent` mechanics to securely line up write transactions back onto the primary execution UI main thread.
-- **Dockable Panes**: Snaps deep structural layouts alongside native Revit properties matrices. These cannot initialize on simple command clicks and must be built as an background service and registered via the `Services/` workspace pipeline on the boot initialization step.
+- **Dockable Panes**: Snaps deep structural layouts alongside native Revit properties matrices. These cannot initialize on simple command clicks and must be built as a background service and registered via the `Services/` workspace pipeline on the boot initialization step.
 
 ---
 
@@ -124,6 +125,7 @@ namespace csRevit_Tools
 
 B. Standard Modal Dialog WPF Initialization Template
 
+C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
@@ -152,6 +154,7 @@ namespace csRevit_Tools
 
 C. Modeless Dialog Palette & External Event Integration Template
 
+C#
 using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -210,6 +213,7 @@ namespace csRevit_Tools
 
 D. Data-Driven State Toggle Button Template (.toggle)
 
+C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
@@ -242,6 +246,7 @@ namespace csRevit_Tools
 
 E. Data-Driven ComboBox Menu Selection Interface Template (.combobox)
 
+C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
@@ -269,6 +274,7 @@ namespace csRevit_Tools
 
 F. Idle/Background Application Event Tracking Template
 
+C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -314,6 +320,7 @@ namespace csRevit_Tools
 
 G. Hybrid SDK Connector Setup (Service Lifecycle + Interactive UI Trigger)
 
+C#
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using csRevit.API;
@@ -368,14 +375,11 @@ namespace csRevit_MyHybridTool
     }
 }
 
+H. Automated MSBuild Project Compilation Manifest (.csproj)
 
-
-H. Automated MSBuild Project Compilation Manifest (`.csproj`)
-
-```xml
+XML
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- Configure clean compilation binaries outputting safely for both structural target dependencies frameworks -->
     <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
     <Platforms>x64</Platforms>
     <UseWPF>true</UseWPF>
@@ -383,7 +387,6 @@ H. Automated MSBuild Project Compilation Manifest (`.csproj`)
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
-  <!-- CONDITIONAL COMPILATION REFERENCE DIRECTIVES: RETRIEVAL SETTINGS TARGETING REVIT 2024 AND OLDER (R24L) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -391,8 +394,7 @@ H. Automated MSBuild Project Compilation Manifest (`.csproj`)
     <Reference Include="System.Xaml" />
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
-      <Private>False</Private> <!-- Explicitly translates compile flags to Copy Local = False -->
-    </Reference>
+      <Private>False</Private> </Reference>
     <Reference Include="RevitAPIUI">
       <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
@@ -403,12 +405,10 @@ H. Automated MSBuild Project Compilation Manifest (`.csproj`)
     </Reference>
   </ItemGroup>
 
-  <!-- CONDITIONAL COMPILATION REFERENCE DIRECTIVES: RETRIEVAL SETTINGS TARGETING REVIT 2025 AND NEWER (R25H) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
-      <Private>False</Private> <!-- Explicitly translates compile flags to Copy Local = False -->
-    </Reference>
+      <Private>False</Private> </Reference>
     <Reference Include="RevitAPIUI">
       <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
@@ -419,30 +419,30 @@ H. Automated MSBuild Project Compilation Manifest (`.csproj`)
     </Reference>
   </ItemGroup>
 
-  <!-- AUTOMATED PIPELINE: SANDBOX DEPLOYMENT AND DYNAMIC CLASS.TXT MANIFEST GENERATOR INTERCEPT ENGINE -->
   <Target Name="DeployToSandbox" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">
     <PropertyGroup>
-      <!-- Leave blank if your target tool module layout doesn't execute background application services processes -->
       <DevServicePath>$(AppData)\csRevit\DEV\Services\MyEnterpriseService</DevServicePath>
-      <!-- Target Deployment UI Workspace Paths mapping directly into our dynamic testing folders grid -->
       <Btn1>$(AppData)\csRevit\DEV\02_Advanced.panel\Quick Select.splitbutton\Select All.pushbutton</Btn1>
       <Btn2>$(AppData)\csRevit\DEV\02_Advanced.panel\Quick Select.splitbutton\Select None.pushbutton</Btn2>
     </PropertyGroup>
 
-    <!-- AUTOMATIC STAGING MANIFESTATION: PIPING COPIES BACK OUT SECURELY INTO DEV ENVIRONMENT ASSETS CHANNELS -->
-    <!-- 1. DEPLOY ASSETS TO BACKGROUND SERVICE SANDBOX CHANNELS IF PATH VALUES ARE RECORDED -->
     <Copy Condition="'$(TargetFramework)' == 'net48' And '$(DevServicePath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(DevServicePath)\R24L" />
     <Copy Condition="'$(TargetFramework)' == 'net8.0-windows' And '$(DevServicePath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(DevServicePath)\R25H" />
 
-    <!-- 2. ROUTE AND COMPILE COPIES DIRECTLY TO FOREGROUND BUTTON ONE INTERFACES DETAILED PATHWAYS -->
     <Copy Condition="'$(TargetFramework)' == 'net48'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn1)\R24L" />
     <Copy Condition="'$(TargetFramework)' == 'net8.0-windows'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn1)\R25H" />
-    <!-- Autogenerate the internal class file descriptor mapping rule to completely isolate tracking classes -->
     <WriteLinesToFile File="$(Btn1)\class.txt" Lines="SelectAllCommand" Overwrite="true" />
 
-    <!-- 3. ROUTE AND COMPILE COPIES DIRECTLY TO FOREGROUND BUTTON TWO INTERFACES DETAILED PATHWAYS -->
     <Copy Condition="'$(TargetFramework)' == 'net48'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn2)\R24L" />
     <Copy Condition="'$(TargetFramework)' == 'net8.0-windows'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn2)\R25H" />
     <WriteLinesToFile File="$(Btn2)\class.txt" Lines="SelectNoneCommand" Overwrite="true" />
   </Target>
 </Project>
+6. Commercial Terms & Closed-Source Integrity
+Intellectual Property Protection
+  
+The core csRevit sync engine and compilation microkernel binaries are strictly closed-source, commercial property managed by SVECS BIM & AUTOMATION.   
+
+Reverse engineering, decompiling compiled assets (.dll elements), or distributing the core installers via unauthorized mirroring infrastructure is explicit violation of the framework's End User License Agreement (EULA). All pre-sales or post-purchase technical inquiries must route through official corporate help channels.   
+
+📩 Enterprise Support & Procurement Routing: support@svecs.in
