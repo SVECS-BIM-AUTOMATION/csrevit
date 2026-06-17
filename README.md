@@ -59,6 +59,7 @@ For formal quotes, Purchase Orders (POs), or dedicated deployment assistance, pl
 * 🚀 [Getting Started & Installation Guide](docs/installation.md)
 * 🏗️ [The Master Folder Tree Layout Manual](docs/user-manual.md)
 * 📄 [AI Agent Context Instruction Specifications (llms.txt)](llms.txt)
+* ⚙️ [Full Core Blueprint & Code Boilerplates (llms-full.txt)](llms-full.txt)
 
 ---
 
