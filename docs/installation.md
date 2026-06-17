@@ -9,7 +9,7 @@ Before beginning execution, ensure your organization's infrastructure meets the 
 
 * **Host Environment:** Autodesk Revit (Versions 2019 through 2026 inclusive) installed natively on Windows workstations.
 * **Network Storage:** Active read/write credentials to a shared corporate network directory, network-attached storage (NAS), or local folder partition intended to serve as your central automation repository (e.g., `Z:\BIM\csRevit_Master`).
-* **Licensing Credentials:** A valid, cryptographically signed Commercial License Key or an active 15-day Free Trial key provisioned through the official [SVECS Appstore](https://appstore.svecs.in).
+* **Licensing Credentials:** A valid, cryptographically signed Commercial License Key or an active 1-Month Free Trial key provisioned through the official [SVECS Appstore](https://appstore.svecs.in).
 
 ---
 
