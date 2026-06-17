@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
+    <Platforms>x64</Platforms>
+    <UseWPF>true</UseWPF>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <!-- REFERENCES FOR REVIT 2024 AND OLDER (R24L) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="csRevit.API">
+      <HintPath>$(AppData)\Autodesk\ApplicationPlugins\csRevit.bundle\Contents\2024\csRevit.API.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- REFERENCES FOR REVIT 2025 AND NEWER (R25H) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="csRevit.API">
+      <HintPath>$(AppData)\Autodesk\ApplicationPlugins\csRevit.bundle\Contents\2025\csRevit.API.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- ========================================================== -->
+  <!-- AUTOMATED HYBRID DEPLOYMENT & CLASS.TXT GENERATOR          -->
+  <!-- ========================================================== -->
+  <Target Name="DeployToSandbox" AfterTargets="Build" Condition="'$(TargetFramework)' != ''">
+
+    <!-- 1. DEFINE YOUR DESTINATION PATHS HERE -->
+    <PropertyGroup>
+      <!-- Leave blank if your tool doesn't use Background Services -->
+      <DevServicePath>$(AppData)\csRevit\DEV\Services\MyEnterpriseService</DevServicePath>
+      
+      <!-- For UI Buttons (Example: Deploying two tools into a Split Button) -->
+      <Btn1>$(AppData)\csRevit\DEV\02_Advanced.panel\Quick Select.splitbutton\Select All.pushbutton</Btn1>
+      <Btn2>$(AppData)\csRevit\DEV\02_Advanced.panel\Quick Select.splitbutton\Select None.pushbutton</Btn2>
+    </PropertyGroup>
+
+    <!-- ========================================== -->
+    <!-- 2. AUTO-DEPLOY BACKGROUND SERVICE          -->
+    <!-- ========================================== -->
+    <Copy Condition="'$(TargetFramework)' == 'net48' And '$(DevServicePath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(DevServicePath)\R24L" />
+    <Copy Condition="'$(TargetFramework)' == 'net8.0-windows' And '$(DevServicePath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(DevServicePath)\R25H" />
+
+    <!-- ========================================== -->
+    <!-- 3. AUTO-DEPLOY UI BUTTON 1                 -->
+    <!-- ========================================== -->
+    <Copy Condition="'$(TargetFramework)' == 'net48'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn1)\R24L" />
+    <Copy Condition="'$(TargetFramework)' == 'net8.0-windows'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn1)\R25H" />
+    <!-- Automatically generate the class.txt file to isolate the command! -->
+    <WriteLinesToFile File="$(Btn1)\class.txt" Lines="SelectAllCommand" Overwrite="true" />
+
+    <!-- ========================================== -->
+    <!-- 4. AUTO-DEPLOY UI BUTTON 2                 -->
+    <!-- ========================================== -->
+    <Copy Condition="'$(TargetFramework)' == 'net48'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn2)\R24L" />
+    <Copy Condition="'$(TargetFramework)' == 'net8.0-windows'" SourceFiles="$(TargetPath)" DestinationFolder="$(Btn2)\R25H" />
+    <!-- Automatically generate the class.txt file to isolate the command! -->
+    <WriteLinesToFile File="$(Btn2)\class.txt" Lines="SelectNoneCommand" Overwrite="true" />
+
+  </Target>
+
+</Project>
